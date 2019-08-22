@@ -1,8 +1,9 @@
 import algoliasearch from 'algoliasearch/lite';
 import React, { Component } from 'react';
-import {InstantSearch,Hits,Pagination,Highlight,Configure,connectSearchBox  } from 'react-instantsearch-dom';
+import {InstantSearch,Hits,Pagination,Highlight,Configure,connectSearchBox } from 'react-instantsearch-dom';
 import PropTypes from 'prop-types';
 import './App.css';
+import _ from 'lodash';
 
 const client = algoliasearch(
   'latency',
@@ -10,28 +11,23 @@ const client = algoliasearch(
 );
 
 class SearchBox extends Component {
-  timerId = null;
+  timerId = 0;
 
   state = {
     value: this.props.currentRefinement
   };
+  
+  setSearch = _.debounce(value => {
+    const {refine} = this.props;
+    this.setState(refine(value))
+}, 200)
 
-  onChangeDebounced = event => {
-    const { refine, delay } = this.props;
-    const value = event.currentTarget.value;
-    clearTimeout(this.timerId);
-    this.timerId = setTimeout(() => refine(value), delay);
-    this.setState(() => ({
-      value
-    }));
-  };
   render() {
-    const value = this.state.value;
+    console.log("this.props.currentRefinement",this.props.currentRefinement);
     return (
       <div className="searchbar"> 
       <input 
-        value={value}
-        onChange={this.onChangeDebounced}
+      onChange={e => {this.setSearch(e.target.value)}}
         placeholder="Search here..."
       />
       </div>
@@ -45,14 +41,12 @@ class App extends Component {
   render() {
     return (
       <div className="ais-InstantSearch">
-       
       <InstantSearch  indexName="ikea" searchClient={client}>
-    
           <div className="left-panel">
             <Configure hitsPerPage={18} />
           </div>
           <div className="right-panel">
-          <DebouncedSearchBox delay={200} />
+          <DebouncedSearchBox />
             <Hits hitComponent={Hit} />
             <Pagination />
           </div>
@@ -62,7 +56,10 @@ class App extends Component {
   }
 }
 
+
+
 function Hit(props) {
+ 
   return (
     <div>
       <img src={props.hit.image} className="image"  />
