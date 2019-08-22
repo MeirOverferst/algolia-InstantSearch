@@ -11,7 +11,6 @@ const client = algoliasearch(
 );
 
 class SearchBox extends Component {
-  timerId = 0;
 
   state = {
     value: this.props.currentRefinement
