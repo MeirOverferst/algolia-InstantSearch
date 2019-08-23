@@ -7,23 +7,18 @@ import _ from 'lodash';
 
 const client = algoliasearch(
   'latency',
-  '6be0576ff61c053d5f9a3225e2a90f76'
+  '6be0576ff61c053d5f9a3225e2a90f76',
 );
 
 class SearchBox extends Component {
-
-  state = {
-    value: this.props.currentRefinement
-  };
-  
-  setSearch = _.debounce(value => {
+    setSearch = _.debounce(value => {
     const {refine} = this.props;
-    this.setState(refine(value))
-}, 200)
+    refine(value);
+    }, 200)
+
 
   render() {
-    console.log("this.props.currentRefinement",this.props.currentRefinement);
-    return (
+        return (
       <div className="searchbar"> 
       <input 
       onChange={e => {this.setSearch(e.target.value)}}
@@ -45,7 +40,7 @@ class App extends Component {
             <Configure hitsPerPage={18} />
           </div>
           <div className="right-panel">
-          <DebouncedSearchBox />
+          <DebouncedSearchBox/>
             <Hits hitComponent={Hit} />
             <Pagination />
           </div>
@@ -58,10 +53,9 @@ class App extends Component {
 
 
 function Hit(props) {
- 
   return (
     <div>
-      <img src={props.hit.image} className="image"  />
+      <img src={props.hit.image} className="image" alt="product-imag" />
       <div >
         <Highlight attribute="name" hit={props.hit} />
       </div>
